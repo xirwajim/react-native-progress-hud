@@ -54,10 +54,10 @@ var ProgressHUD = React.createClass({
   getDefaultProps() {
     return {
       isDismissible: false,
-      color: '#000',
-      textColor: '#000',
+      color: '#fff',
+      textColor: '#fff',
       fontName: null,
-      overlayColor: 'rgba(0, 0, 0, 0)',
+      overlayColor: 'rgba(0, 0, 0, 0.11)',
       viewColor: 'rgba(0, 0, 0, 0.9)',
       is_hud_visible: false
     };
