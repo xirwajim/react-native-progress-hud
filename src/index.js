@@ -7,25 +7,42 @@ var {
   Image,
   StyleSheet,
   TouchableHighlight,
-  View
-} = React;
+  View,
+  Text
+  } = React;
 
 var styles = require('./styles');
 var images = require('./images');
 
 var SPIN_DURATION = 1000;
 
-var ProgressHUDMixin = {
-  getInitialState() {
-    return {
-      is_hud_visible: false
-    };
+
+var ProgressHUD = React.createClass({
+  mixins: [tweenState.Mixin],
+
+  propTypes: {
+    isDismissible: React.PropTypes.bool,
+    isVisible: React.PropTypes.bool,
+    color: React.PropTypes.string,
+    textColor: React.PropTypes.string,
+    fontName: React.PropTypes.string,
+    viewColor: React.PropTypes.string,
+    overlayColor: React.PropTypes.string
   },
 
-  showProgressHUD() {
+  showProgressHUD(text) {
+
+    if(typeof text !='undefind'){
+      this.setState({
+        is_hud_visible: true,
+        text:text
+      });
+      return
+    }
     this.setState({
-      is_hud_visible: true
+      is_hud_visible: true,
     });
+
   },
 
   dismissProgressHUD() {
@@ -34,43 +51,15 @@ var ProgressHUDMixin = {
     });
   },
 
-  childContextTypes: {
-    showProgressHUD: React.PropTypes.func,
-    dismissProgressHUD: React.PropTypes.func
-  },
-
-  getChildContext() {
-    return {
-      showProgressHUD: this.showProgressHUD,
-      dismissProgressHUD: this.dismissProgressHUD
-    };
-  },
-};
-
-var ProgressHUD = React.createClass({
-  mixins: [tweenState.Mixin],
-
-  contextTypes: {
-    showProgressHUD: React.PropTypes.func.isRequired,
-    dismissProgressHUD: React.PropTypes.func
-  },
-
-  statics: {
-    Mixin: ProgressHUDMixin
-  },
-
-  propTypes: {
-    isDismissible: React.PropTypes.bool,
-    isVisible: React.PropTypes.bool.isRequired,
-    color: React.PropTypes.string,
-    overlayColor: React.PropTypes.string
-  },
-
   getDefaultProps() {
     return {
       isDismissible: false,
       color: '#000',
-      overlayColor: 'rgba(0, 0, 0, 0)'
+      textColor: '#000',
+      fontName: null,
+      overlayColor: 'rgba(0, 0, 0, 0)',
+      viewColor: 'rgba(0, 0, 0, 0.9)',
+      is_hud_visible: false
     };
   },
 
@@ -110,14 +99,22 @@ var ProgressHUD = React.createClass({
 
   render() {
     // Return early if not visible
-    if (!this.props.isVisible) {
+    if (!this.state.is_hud_visible) {
       return <View />;
     }
 
     // Set rotation property value
     var deg = Math.floor(
-      this.getTweeningValue('rotate_deg')
-    ).toString() + 'deg';
+        this.getTweeningValue('rotate_deg')
+      ).toString() + 'deg';
+
+
+    let text ;
+    if(this.state.text){
+      text =<Text style={[styles.text_style,{fontFamily:this.props.fontName,color:this.props.textColor}]}>{this.state.text}</Text>;
+    }else{
+
+    }
 
     return (
       /*jshint ignore:start */
@@ -132,7 +129,8 @@ var ProgressHUD = React.createClass({
       >
         <View
           style={[styles.container, {
-            left: this.getTweeningValue('left')
+            left: this.getTweeningValue('left'),
+            backgroundColor: this.props.viewColor
           }]}
         >
           <Image
@@ -143,13 +141,14 @@ var ProgressHUD = React.createClass({
               ]
             }]}
             source={{
-              uri: 'data:image/png;base64,' + images['1x'],
+              uri: 'data:image/png;base64,' + images['2x'],
               isStatic: true
             }}
           >
-            <View style={styles.inner_spinner}>
+            <View style={[styles.inner_spinner,{ backgroundColor:"rgba(0, 0, 0, 1)"}]}>
             </View>
           </Image>
+          {text}
         </View>
       </TouchableHighlight>
       /*jshint ignore:end */
