@@ -104,7 +104,7 @@ var ProgressHUD = React.createClass({
 
   _clickHandler() {
     if (this.props.isDismissible) {
-      this.context.dismissProgressHUD();
+      this.dismissProgressHUD();
     }
   },
 
